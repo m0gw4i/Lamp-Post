@@ -40,9 +40,18 @@
 	      	<p class="lead">{{ ct }}&deg;F - {{ hs }}</p>
 	      	<h3>This Week</h3>
 	      	<p class="lead">{{ wd }}</p>
-	      </div>
+	      	<br>
+	      	<h1>Top NYT Articles</h1>
+	      	<div class="row">
+	      		
+	      		{% for title, url in news.iteritems() %}
+	      			<a class="list-group-item" href={{ url }}>{{ title }}</a>
+	      		{% endfor %}
+	      		
+	  		</div>
+		</div>
 
-    </div><!-- /.container -->
+	</div><!-- /.container -->
     
     
   </body>
