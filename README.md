@@ -1,2 +1,2 @@
 # Lamp-Post
-![Screenshot](screenshpt.png "Optional title")
+![Screenshot](screenshot.png "Optional title")
