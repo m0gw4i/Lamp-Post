@@ -29,9 +29,11 @@
 	  <div class="container">
 	      <div class="starter-template">
 	      	<h1>Alewife Times</h1>
-	      	{% if alerts %}
-	        	<button type="button" class="btn btn-danger" onclick="window.location.href='http://www.mbta.com/rider_tools/transit_updates/'">Red Line Alert</button>
-	        {% endif %}
+	      	{% for header in alerts %}
+	        	<div class="alert alert-danger" role="alert">
+        			<strong>{{ header }}</string>
+      			</div>
+	        {% endfor %}
 	        <p class="lead">
 	        {% for time in h_times %}
 				{{ time }}<br>

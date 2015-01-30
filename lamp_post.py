@@ -40,6 +40,8 @@ def get_times(api, stop):
     return predictions
 
 def get_alerts(api, stop):
+    alerts = {}
+    alert_headers = []
     url = "http://realtime.mbta.com/developer/api/v2/alertheadersbystop"
     opener = urllib2.build_opener()
     urllib2.install_opener(opener)
@@ -47,8 +49,10 @@ def get_alerts(api, stop):
     data = urllib.urlencode(params)
     response = urllib2.urlopen("%s?%s" %(url, data)).read()
     parsed = json.loads(response)
-    alerts = parsed['alert_headers']
-    return alerts
+    alerts = parsed
+    if alerts.has_key('alert_headers'):
+        alert_headers = [i['header_text'] for i in alerts['alert_headers'] if i.has_key('header_text')]
+    return alert_headers
 
 def get_weather(api_key, lat, lng):
     w = forecastio.load_forecast(api_key, lat, lng)
@@ -94,12 +98,7 @@ def display():
     
     alerts = cache.get('alerts')
     if alerts is None:
-        mbta_alerts = get_alerts(mbta_api, stop)
-        print mbta_alerts
-        if mbta_alerts:
-            alerts = True
-        else:
-            alerts = False
+        alerts = get_alerts(mbta_api, stop)
         cache.set('alerts', alerts, timeout=30*60)
     weather = cache.get('weather')
     if weather is None:
