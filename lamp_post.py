@@ -39,15 +39,15 @@ def get_times(api, stop):
                         times.append(pre_time)
     return predictions
 
-def get_alerts(api, route):
-    url = "http://realtime.mbta.com/developer/api/v2/alertsbyroute"
+def get_alerts(api, stop):
+    url = "http://realtime.mbta.com/developer/api/v2/alertheadersbystop"
     opener = urllib2.build_opener()
     urllib2.install_opener(opener)
-    params = {'api_key': api, 'route': route, 'format': "json", 'include_access_alerts': "false"}
+    params = {'api_key': api, 'stop': stop, 'format': "json", 'include_access_alerts': "false"}
     data = urllib.urlencode(params)
     response = urllib2.urlopen("%s?%s" %(url, data)).read()
     parsed = json.loads(response)
-    alerts = parsed['alerts']
+    alerts = parsed['alert_headers']
     return alerts
 
 def get_weather(api_key, lat, lng):
@@ -91,9 +91,16 @@ def display():
         predictions = get_times(mbta_api, stop)
         cache.set('predictions', predictions, timeout=20)
     
-    alerts_931 = get_alerts(mbta_api, "931_")
-    alerts_933 = get_alerts(mbta_api, "933_")
-
+    
+    alerts = cache.get('alerts')
+    if alerts is None:
+        mbta_alerts = get_alerts(mbta_api, stop)
+        print mbta_alerts
+        if mbta_alerts:
+            alerts = True
+        else:
+            alerts = False
+        cache.set('alerts', alerts, timeout=30*60)
     weather = cache.get('weather')
     if weather is None:
         weather = get_weather(forecastio_api, lat, lng)
@@ -110,7 +117,7 @@ def display():
         cache.set('news', news, timeout=60*60)
 
 
-    return render_template('index.html', h_times=h_times, ct=ct, hs=hs, wd=wd, news=news)
+    return render_template('index.html', h_times=h_times, ct=ct, hs=hs, wd=wd, news=news, alerts=alerts)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0')
