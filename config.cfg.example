@@ -4,4 +4,9 @@ stop =
 [Forecast]
 api = 
 lat = 
-lng = 
+lng =
+[NYT]
+api = 
+[APP]
+debug = 
+ 
