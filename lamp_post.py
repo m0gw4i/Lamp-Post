@@ -119,4 +119,4 @@ def display():
     return render_template('index.html', h_times=h_times, ct=ct, hs=hs, wd=wd, news=news, alerts=alerts)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=config.get('APP', 'debug'))
+	app.run(host='0.0.0.0')
