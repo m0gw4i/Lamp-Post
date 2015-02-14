@@ -84,10 +84,17 @@
 
         		</div>
         		<div class="col-xs-6">
-        			<h1>Top NYT Articles</h1>
+        			<h1>Reddit Front Page</h1>
 		      		<div class="row">
-		      			{% for title, url in news.iteritems() %}
-		      				<a class="list-group-item" href={{ url }}>{{ title }}</a>
+		      			{% for karma, story, url, permalink in front_page %}
+		      				<div class="list-group-item" style="overflow:hidden;">
+		      					<div class="left-text" style="width:70%; float:left;">
+		      						<a style="color: #555;" class="" href={{ url }}>{{ story }}</a>
+		      					</div>
+		      					<div stlye="width:30%; float:right;">
+		      						<a href={{ permalink }}><span class="badge" style="background-color: #337ab7; padding-right:1em; padding-left:1em; padding-top:1em; padding-bottom:1em;">{{ karma }}</span></a>
+		      					</div>
+		      				</div>
 		      			{% endfor %}
 		      		</div>	
 

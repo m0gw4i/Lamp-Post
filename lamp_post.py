@@ -7,6 +7,8 @@ import ConfigParser
 import sys
 from werkzeug.contrib.cache import SimpleCache
 import forecastio
+import praw
+
 cache = SimpleCache()
 
 
@@ -78,6 +80,12 @@ def get_nyt(api_key):
         nyt.setdefault(title, url)
     return nyt
 
+def get_reddit_fp():
+    r = praw.Reddit(user_agent='lamp_post')
+    fp = r.get_front_page(limit=10)
+    fp = [(x.score, x.title, x.url, x.permalink) for x in fp]
+    return fp
+
 @app.route("/")
 def display():
     h_times = []
@@ -115,8 +123,12 @@ def display():
         news = get_nyt(nyt_api)
         cache.set('news', news, timeout=60*60)
 
+    front_page = cache.get('reddit_front_page')
+    if front_page is None:
+        front_page = get_reddit_fp()
+        cache.set('reddit_front_page', front_page, timeout=60*60)
 
-    return render_template('index.html', h_times=h_times, ct=ct, hs=hs, wd=wd, news=news, alerts=alerts)
+    return render_template('index.html', h_times=h_times, ct=ct, hs=hs, wd=wd, news=news, alerts=alerts, front_page=front_page)
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0')
