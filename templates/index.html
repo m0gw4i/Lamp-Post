@@ -12,7 +12,7 @@
 	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
-	<link rel="stylesheet" href="http://getbootstrap.com/examples/starter-template/starter-template.css">
+	<!--<link rel="stylesheet" href="http://getbootstrap.com/examples/starter-template/starter-template.css">-->
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -24,41 +24,77 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <style>
+    	.starter-template {
+    		padding: 40px 15px;
+			padding-top: 10px;
+			padding-right: 15px;
+			padding-bottom: 40px;
+			padding-left: 15px;
+			text-align: center;
+		}
+		.left-text {
+			text-align: left;
+		}
+		.alert-text {
+			color: rgb(169, 68, 66);
+		}		}
+	</style>
 </head>
   <body>
 	  <div class="container">
 	      <div class="starter-template">
 	      	<h1>Alewife Times</h1>
-	      	{% for header in alerts %}
-	        	<div class="alert alert-danger" role="alert">
-        			<strong>{{ header }}</string>
-      			</div>
-	        {% endfor %}
+	      	{% if alerts %}
+		      	<div class="panel panel-danger">
+	            	<div class="panel-heading">
+	              		<h3 class="panel-title">Red Line Alerts</h3>
+	            	</div>
+	            	<div class="panel-body left-text">
+	              		{% for header in alerts %}
+	              			<strong class="alert-text">{{ header }}</strong><br style="line-height: 200%;" />
+	              		{% endfor %}
+	            	</div>
+	          	</div>
+	        {% endif %}
+	      	
+	               
 	        <p class="lead">
 	        {% for time in h_times %}
-				{{ time }}<br>
+				<p class="lead">{{ time }}</p><br />
 			{% endfor %}
 	       	</p>
 	        <br>
 	        <p class="lead">
 		        <h1>Forecast</h1>
 		      	<h3>Current Conditions</h3>
-		      	<p class="lead">{{ ct }}&deg;F - {{ hs }}</p>
+		      	<p class="lead left-text">{{ ct }}&deg;F - {{ hs }}</p>
 		      	<h3>This Week</h3>
-		      	<p class="lead">{{ wd }}</p>
+		      	<p class="lead left-text">{{ wd }}</p>
 		    </p>
 	      	<br>
-	      	<p class="lead">
-	      	<h1>Top NYT Articles</h1>
-		      	<div class="row">
-		      		
-		      		{% for title, url in news.iteritems() %}
-		      			<a class="list-group-item" href={{ url }}>{{ title }}</a>
-		      		{% endfor %}
-		      		
-		  		</div>
-	  		</p>
-		</div>
+	      	<div class="row">
+        		<div class="col-xs-6">
+        			<h1>Top NYT Articles</h1>
+		      		<div class="row">
+		      			{% for title, url in news.iteritems() %}
+		      				<a class="list-group-item" href={{ url }}>{{ title }}</a>
+		      			{% endfor %}
+		      		</div>
+
+        		</div>
+        		<div class="col-xs-6">
+        			<h1>Top NYT Articles</h1>
+		      		<div class="row">
+		      			{% for title, url in news.iteritems() %}
+		      				<a class="list-group-item" href={{ url }}>{{ title }}</a>
+		      			{% endfor %}
+		      		</div>	
+
+        		</div>
+      		</div>
+	      	
+	  	</div>
 
 	</div><!-- /.container -->
     
