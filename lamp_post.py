@@ -90,7 +90,7 @@ def get_nyt(api_key):
 def get_reddit_fp():
     r = praw.Reddit(user_agent='lamp_post')
     fp = r.get_front_page(limit=10)
-    fp = [(x.score, x.title, x.url, x.permalink) for x in fp]
+    fp = [(x.score, x.title, x.url, x.permalink, x.thumbnail) for x in fp]
     return fp
 
 @app.route("/")
