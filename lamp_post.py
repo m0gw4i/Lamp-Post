@@ -18,6 +18,7 @@ config.readfp(open(r'config.cfg'))
 app = Flask(__name__)
 
 def get_times(api, stop):
+    h_times = list()
     url = "http://realtime.mbta.com/developer/api/v2/predictionsbystop"
     opener = urllib2.build_opener()
     urllib2.install_opener(opener)
@@ -26,7 +27,6 @@ def get_times(api, stop):
     try:
         response = urllib2.urlopen("%s?%s" %(url, data)).read()
         parsed = json.loads(response)
-
         predictions = dict()
         for i in parsed['mode']:
             for r in i['route']:
@@ -38,10 +38,13 @@ def get_times(api, stop):
                             pre_time = "%s:%s min" %(mins, secs)
                             times = predictions.setdefault(heading, list())
                             times.append(pre_time)
-        for heading, times in predictions.iteritems():
-            mins = [str(x) for x in times][0:2]
-            h_times.append("%s: %s" %(heading, " & ".join(mins)))
-        return h_times
+        if predictions:
+            for heading, times in predictions.iteritems():
+                mins = [str(x) for x in times][0:2]
+                h_times.append("%s: %s" %(heading, " & ".join(mins)))
+            return h_times
+        else:
+            return ["No Predictions"]
     except urllib2.HTTPError:
         return ["No Predictions"]
 
@@ -135,4 +138,4 @@ def display():
     return render_template('index.html', predictions=predictions, ct=ct, hs=hs, wd=wd, news=news, alerts=alerts, front_page=front_page)
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0')
+	app.run(host='0.0.0.0', debug=True)
