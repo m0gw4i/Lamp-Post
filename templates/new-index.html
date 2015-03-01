@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lamp Post</title>
+
+    <!-- Bootstrap -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/skycons.js') }}"</script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  <style>
+    .wlist li
+    {
+    display: inline;
+    list-style-type: none;
+    padding-right: 20px;
+    }
+  </style>
+  </head>
+  <body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    
+    
+      <div class="container">
+        <div class="row">
+          <div style="width:20%; float:left; text-align:center;">
+            <canvas id="current" width="128" height="128"></canvas>
+            <h3>{{ cc['app_temp'] }}&deg;</h3>
+            <h5>{{ cc['pp'] }}</h5>
+            <script>
+                  var skycons = new Skycons({"color": "black"});
+                  skycons.add("current", "{{ cc['icon'] }}");
+                  skycons.play()
+                </script>
+          </div>
+          <div style="width:80%; float:left">
+              <br/>
+              <br/>
+              {% for day in week %}
+                <div style="width:12%; float:left; text-align:center;">
+                    <h4>{{ day['day'] }}</h4>
+                    <h6>{{ day['date'] }}</h6>
+                    <canvas id="{{ day['day'] }}" width="40" height="40"></canvas>
+                    <p>
+                      <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>{{ day['max_temp'] }}&deg;
+                      <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>{{ day['min_temp'] }}&deg;
+                    </p>
+                    {{ day['pp'] }}
+                </div>
+                <script>
+                  var skycons = new Skycons({"color": "black"});
+                  skycons.add("{{ day['day'] }}", "{{ day['icon'] }}");
+                  skycons.play()
+                </script>
+              {% endfor %}
+            
+          </div>
+        </div>
+        <hr>
+      </div>
+      <div class="container">
+        <div class="">
+            <h3>Transit Times</h3>
+            <div class="col-md-4">
+              <h4>Alewife</h4>
+              {% if alerts %}
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Red Line Alerts</h3>
+                    </div>
+                    <div class="panel-body left-text">
+                        {% for header in alerts %}
+                          <strong class="alert-text">{{ header }}</strong><br style="line-height: 200%;" />
+                        {% endfor %}
+                    </div>
+                </div>
+              {% endif %}
+              <p class="lead">
+                <ul class="list-group">
+                  {% for heading, times in predictions.iteritems() %}
+                  <li class="list-group-item">
+                    <span class="badge" style="background-color: #d9534f">{{ " & ".join(times[0:2]) }} mins</span>
+                    {{ heading }}
+                  </li>
+                  {% endfor %}
+                </ul>
+             
+              </p>
+            </div>
+            <div class="col-md-4">
+              <h4>Busses</h4>
+            </div>
+            <div class="col-md-4">
+              <h4>Shuttle</h4>
+            </div>
+
+        </div>
+        
+      </div>
+
+      <div class="container">
+          <hr>
+          <div class="col-xs-6">
+            <h3>Top New York Times Articles</h3>
+            <div class="row" style="padding-right:50px">
+                {% for article in news %}
+                  <div>
+                    <a style="color: #555;" href={{ article['url'] }}>
+                      <h5>{{ article['title'] }}</h5>
+                      <p>{{ article['abstract'] }}
+                      <p>{{ article['byline'] }}</p>
+                    </a>
+                  </div>
+                {% endfor %}
+              </div>
+          </div>
+          <div class="col-xs-6">
+            <h3>Reddit Front Page</h3>
+            <div class="row">
+                {% for karma, story, url, permalink, thumbnail in front_page %}
+                  <div class="" style="overflow:hidden;">
+                    <div class="col-xs-12 col-md-3" style="padding-left:0px; padding-right:0px;">
+                      {% if thumbnail == "default" or thumbnail == "" %}
+                        <a href={{ url }}><img src="https://pbs.twimg.com/profile_images/459083822470946816/VGv0AGio.png" style="max-width:40%; max-height:40%;"></img></a>
+                      {% else %}
+                        <a href={{ url }}><img src={{ thumbnail }} style="max-width:40%; max-height:40%;"></img></a>
+                      {% endif %}
+                    </div>
+                    <div class="left-text col-xs-6 col-md-6" style="padding-left:0px;">
+                      <a style="color: #555;" class="" href={{ url }}>{{ story }}</a>
+                    </div>
+                    <div class="col-xs-12 col-md-3" style="padding-left:0px; padding-right:0px;">
+                      <a href={{ permalink }}><span class="badge" style="background-color: #337ab7; padding-right:1em; padding-left:1em; padding-top:1em; padding-bottom:1em;">{{ karma }}</span></a>
+                    </div>
+                  </div>
+                  <br />
+                {% endfor %}
+              </div>  
+          </div>
+          
+        </div>
+      </div>
+  </body>
+</html>

@@ -8,7 +8,7 @@ import sys
 from werkzeug.contrib.cache import SimpleCache
 import forecastio
 import praw
-
+import datetime
 cache = SimpleCache()
 
 
@@ -35,14 +35,15 @@ def get_times(api, stop):
                         for p in d['trip']:
                             heading = p['trip_headsign']
                             mins, secs = str(datetime.timedelta(seconds=int(p['pre_away']))).split(":")[1:]
-                            pre_time = "%s:%s min" %(mins, secs)
+                            pre_time = "%s:%s" %(mins, secs)
                             times = predictions.setdefault(heading, list())
-                            times.append(pre_time)
+                            times.append(mins)
         if predictions:
-            for heading, times in predictions.iteritems():
+            return predictions
+            '''for heading, times in predictions.iteritems():
                 mins = [str(x) for x in times][0:2]
                 h_times.append("%s: %s" %(heading, " & ".join(mins)))
-            return h_times
+            return h_times'''
         else:
             return ["No Predictions"]
     except urllib2.HTTPError:
@@ -68,15 +69,19 @@ def get_alerts(api, stop):
 
 def get_weather(api_key, lat, lng):
     w = forecastio.load_forecast(api_key, lat, lng)
-    ct = w.currently().d['apparentTemperature']
-    ct = "%s" %(ct)
-    hs = w.hourly().summary
-    wd = w.daily().summary
-    
-    return ct, hs , wd
+    cat = "{0:.0f}".format(w.currently().d['apparentTemperature'])
+    ci = w.currently().d['icon']
+    cp = w.currently().d['precipProbability']
+    cc = {'app_temp': cat, 'icon': ci, 'pp': "{0:.0f}%".format(cp * 100)}
+    week = list()
+    for d in w.daily().data:
+        ds = dict()
+        ds = {'day': "%s" %(d.time.strftime("%A")), 'date': "%s" %(d.time.strftime("%b %d")), 'max_temp': "{0:.0f}".format(d.d['temperatureMax']), 'min_temp': "{0:.0f}".format(d.d['temperatureMin']), 'icon': d.d['icon'], 'pp': "{0:.0f}%".format(d.d['precipProbability'] * 100)}
+        week.append(ds)
+    return cc, week
 
 def get_nyt(api_key):
-    nyt = dict()
+    nyt = list()
     url = "http://api.nytimes.com/svc/topstories/v1/home.json"
     params = {'api-key': api_key}
     data = urllib.urlencode(params)
@@ -87,7 +92,9 @@ def get_nyt(api_key):
     for r in parsed['results'][0:10]:
         title = r['title']
         url = r['url']
-        nyt.setdefault(title, url)
+        abstract = r['abstract']
+        byline = r['byline']
+        nyt.append({'title': title, 'url': url, 'abstract': abstract, 'byline': byline})
     return nyt
 
 def get_reddit_fp():
@@ -122,7 +129,7 @@ def display():
     if weather is None:
         weather = get_weather(forecastio_api, lat, lng)
         cache.set('weather', weather, timeout=60*60)
-    ct, hs, wd = weather
+    cc, week = weather
 
     
     news = cache.get('news')
@@ -135,7 +142,7 @@ def display():
         front_page = get_reddit_fp()
         cache.set('reddit_front_page', front_page, timeout=60*60)
 
-    return render_template('index.html', predictions=predictions, ct=ct, hs=hs, wd=wd, news=news, alerts=alerts, front_page=front_page)
+    return render_template('new-index.html', predictions=predictions, cc=cc, week=week, news=news, alerts=alerts, front_page=front_page)
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0')
+	app.run(host='0.0.0.0', debug=True)
