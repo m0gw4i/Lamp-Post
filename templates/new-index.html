@@ -56,7 +56,7 @@
                 <div style="width:12%; float:left; text-align:center;">
                     <h4>{{ day['day'] }}</h4>
                     <h6>{{ day['date'] }}</h6>
-                    <canvas id="{{ day['day'] }}" width="40" height="40"></canvas>
+                    <canvas id="{{ day['date'] }}" width="40" height="40"></canvas>
                     <p>
                       <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>{{ day['max_temp'] }}&deg;
                       <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>{{ day['min_temp'] }}&deg;
@@ -65,7 +65,7 @@
                 </div>
                 <script>
                   var skycons = new Skycons({"color": "black"});
-                  skycons.add("{{ day['day'] }}", "{{ day['icon'] }}");
+                  skycons.add("{{ day['date'] }}", "{{ day['icon'] }}");
                   skycons.play()
                 </script>
               {% endfor %}
