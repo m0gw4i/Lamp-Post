@@ -9,6 +9,7 @@ from werkzeug.contrib.cache import SimpleCache
 import forecastio
 import praw
 import datetime
+import time
 cache = SimpleCache()
 
 
@@ -102,7 +103,9 @@ def get_reddit_fp():
     fp = r.get_front_page(limit=10)
     fp = [(x.score, x.title, x.url, x.permalink, x.thumbnail) for x in fp]
     return fp
-
+@app.route("/_getText")
+def getText():
+    return time.strftime("%H:%M:%S")
 @app.route("/")
 def display():
     h_times = []
